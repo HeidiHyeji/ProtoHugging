@@ -145,37 +145,33 @@ with col2:
         except Exception as e:
             st.error(f"SQL 실행 오류: {str(e)}")
 
-# 🔹 대화 내역 출력
+# 🔹 우측: AI 대화창 (RAG 기반 AI 검색)
 if st.session_state.ai_chat_visible:
     with col3:
         st.header("💬 AI 스맛리온")
+        # 🔹 사용자 입력 받기
+        user_query = st.text_input("질문을 입력하세요...", key="user_query", placeholder="나이가 30살인 사람 찾아줘")  # 응답 출력 아래에 배치
 
         # 🔹 기존 대화 기록 출력
         for chat in st.session_state.chat_history:
             with st.chat_message(chat["role"]):
                 st.markdown(chat["message"])
 
-        # 🔹 입력창을 브라우저 가장 아래에 배치
-        user_query = st.text_input("질문을 입력하세요...", key="user_query", placeholder="30살 사람 찾아줘")
+        if user_query:
+            with st.chat_message("user"):
+                st.markdown(f"**🙋‍♂️ 질문:** {user_query}")
 
-# 🔹 질문이 입력되었을 때 실행
-if user_query:
-    with col3:
-        with st.chat_message("user"):
-            st.markdown(f"**🙋‍♂️ 질문:** {user_query}")
+            # 🔹 스트리밍 방식으로 응답 출력
+            with st.chat_message("assistant"):
+                response_placeholder = st.empty()
+                response_text = ""
 
-        # 🔹 스트리밍 방식으로 응답 출력
-        with st.chat_message("assistant"):
-            response_placeholder = st.empty()
-            response_text = ""
+                for chunk in qa_chain.stream({"question": user_query, "chat_history": st.session_state.chat_history}):
+                    response_text += chunk["answer"]
+                    response_placeholder.markdown(response_text + "▌")
 
-            for chunk in qa_chain.stream({"question": user_query, "chat_history": st.session_state.chat_history}):
-                response_text += chunk["answer"]
-                response_placeholder.markdown(response_text + "▌")
+                response_placeholder.markdown(response_text)
 
-            response_placeholder.markdown(response_text)
-
-        # 🔹 대화 기록 저장
-        st.session_state.chat_history.append({"role": "user", "message": user_query})
-        st.session_state.chat_history.append({"role": "assistant", "message": response_text})
-
+            # 🔹 대화 기록 저장
+            st.session_state.chat_history.append({"role": "user", "message": user_query})
+            st.session_state.chat_history.append({"role": "assistant", "message": response_text})
