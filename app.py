@@ -17,7 +17,7 @@ from dotenv import load_dotenv  # 환경 변수 로드를 위한 모듈
 load_dotenv()
 
 # 🔹 OpenAI API 설정
-OPENAI_API_KEY = st.secrets("OPENAI_API_KEY")  # 환경변수에서 가져오기
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]  # 환경변수에서 가져오기
 
 # 🔹 DuckDB 초기화
 db = duckdb.connect(":memory:")
