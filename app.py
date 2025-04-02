@@ -41,7 +41,8 @@ llm = ChatOpenAI(
     openai_api_key=OPENAI_API_KEY,
     model="gpt-4",  # GPT-3.5 모델 사용
     temperature=0.1,  # 낮은 temperature로 일관된 출력 생성
-    max_tokens=1000  # 충분한 길이의 요약을 위한 토큰 수 설정
+    max_tokens=1000,  # 충분한 길이의 요약을 위한 토큰 수 설정
+    streaming = True
 )
 
 
@@ -84,13 +85,16 @@ st.set_page_config(layout="wide")
 if "explorer_visible" not in st.session_state:
     st.session_state.explorer_visible = True
 if "ai_chat_visible" not in st.session_state:
-    st.session_state.ai_chat_visible = False
+    st.session_state.ai_chat_visible = True
+# 🔹 세션 상태 변수 초기화
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 ### 🔹 버튼 UI 추가
 col_title, col_buttons = st.columns([3, 1])  
 
 with col_title:
-    st.markdown("<h1 style='text-align: center;'>DuckDB SQL 실행 웹 UI</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>AI스맛리온</h1>", unsafe_allow_html=True)
 
 with col_buttons:
     st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
@@ -141,14 +145,37 @@ with col2:
         except Exception as e:
             st.error(f"SQL 실행 오류: {str(e)}")
 
-### 🔹 우측: AI 대화창 (RAG 기반 AI 검색)
+# 🔹 대화 내역 출력
 if st.session_state.ai_chat_visible:
     with col3:
         st.header("💬 AI 스맛리온")
 
-        user_query = st.text_input("질문 입력", "나이가 30 이상인 사용자 알려줘")
+        # 🔹 기존 대화 기록 출력
+        for chat in st.session_state.chat_history:
+            with st.chat_message(chat["role"]):
+                st.markdown(chat["message"])
 
-        if st.button("검색"):
-            response = qa_chain({'question': user_query})
-            st.write("스맛리온 💡:  \n", response['answer']
-)
+        # 🔹 입력창을 브라우저 가장 아래에 배치
+        user_query = st.text_input("질문을 입력하세요...", key="user_query", placeholder="30살 사람 찾아줘")
+
+# 🔹 질문이 입력되었을 때 실행
+if user_query:
+    with col3:
+        with st.chat_message("user"):
+            st.markdown(f"**🙋‍♂️ 질문:** {user_query}")
+
+        # 🔹 스트리밍 방식으로 응답 출력
+        with st.chat_message("assistant"):
+            response_placeholder = st.empty()
+            response_text = ""
+
+            for chunk in qa_chain.stream({"question": user_query, "chat_history": st.session_state.chat_history}):
+                response_text += chunk["answer"]
+                response_placeholder.markdown(response_text + "▌")
+
+            response_placeholder.markdown(response_text)
+
+        # 🔹 대화 기록 저장
+        st.session_state.chat_history.append({"role": "user", "message": user_query})
+        st.session_state.chat_history.append({"role": "assistant", "message": response_text})
+
