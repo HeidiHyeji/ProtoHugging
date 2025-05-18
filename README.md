@@ -4,3 +4,4 @@
 - duckdb embedding(vector화),  prompting 구현
 - gpt-4, 0.1 temperature, 1000 max tokens
 
+![alt text](image-1.png)
