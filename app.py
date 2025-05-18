@@ -51,7 +51,7 @@ template = """""Please use the following context to answer the question at the e
     2. Use up to three sentences. Keep your answers as concise as possible.\
     3. Please answer in Korean and keep your SQL query grammar in English. Be sure to follow the SQL grammar. 
     4. Keep the capital letter, column name of the context in your SQL query grammar\
-    5. Always "\n"\n스마트리온 Partner, thank you for asking!!👍" \n"\
+    5. Always "\n"\매지 Partner, thank you for asking!!👍" \n"\
     
 {context}
 Question: {question}
@@ -94,13 +94,13 @@ if "chat_history" not in st.session_state:
 col_title, col_buttons = st.columns([3, 1])  
 
 with col_title:
-    st.markdown("<h1 style='text-align: center;'>AI스맛리온</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>대화형 SQL</h1>", unsafe_allow_html=True)
 
 with col_buttons:
     st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
     if st.button("📂 탐색기 열기 / 닫기"):
         st.session_state.explorer_visible = not st.session_state.explorer_visible  # 버튼 토글
-    if st.button("🤖 AI스맛리온"):
+    if st.button("🤖 대화형 SQL"):
         st.session_state.ai_chat_visible = not st.session_state.ai_chat_visible  # 버튼 토글
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -148,7 +148,7 @@ with col2:
 # 🔹 우측: AI 대화창 (RAG 기반 AI 검색)
 if st.session_state.ai_chat_visible:
     with col3:
-        st.header("💬 AI 스맛리온")
+        st.header("💬 대화형 SQL")
         # 🔹 사용자 입력 받기
         user_query = st.text_input("질문을 입력하세요...", key="user_query", placeholder="나이가 30살인 사람 찾아줘")  # 응답 출력 아래에 배치
 
