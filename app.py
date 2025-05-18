@@ -94,7 +94,7 @@ if "chat_history" not in st.session_state:
 col_title, col_buttons = st.columns([3, 1])  
 
 with col_title:
-    st.markdown("<h1 style='text-align: center;'>대화형 SQL</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>😎 내맘대로! 대화형 SQL 🙌</h1>", unsafe_allow_html=True)
 
 with col_buttons:
     st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
